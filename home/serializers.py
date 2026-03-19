@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import Person
+from . models import Person, Color
 
 class PeopleSerializer(serializers.ModelSerializer):
     
@@ -17,6 +17,11 @@ class PeopleSerializer(serializers.ModelSerializer):
         if data['age'] < 18:
             raise serializers.ValidationError('age should be greater than 18')
         
-        return data 
+        return data
+class ColorSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Color
+        fields = ['color_name']
     
     

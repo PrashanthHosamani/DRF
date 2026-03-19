@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from . models import Person
-from . serializers import PeopleSerializer
+from . models import Person, Color
+from . serializers import PeopleSerializer, ColorSerializer
 
 
 # api/i
@@ -59,9 +59,26 @@ def people(request):
             return Response(serializer.data)
         return Response(serializer.errors)
     
-    
     else:
         data = request.data 
         objs = Person.objects.get(id = data['id'])
         objs.delete()
         return Response({"message" : 'Person deleted'})
+    
+    
+    
+@api_view(['GET', 'POST'])
+def color(request):
+    if request.method == 'GET':
+        objs = Color.objects.all()
+        serializer = ColorSerializer(objs, many = True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+       data = request.data
+       serializer = ColorSerializer(data = data, many =True)
+       if serializer.is_valid():
+           serializer.save()
+           return Response(serializer.data)
+       return Response(serializer.errors)
+       
