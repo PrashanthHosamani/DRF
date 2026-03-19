@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from . models import Person
+from . serializers import PeopleSerializer
 
 
 # api/i
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def index(request):
     courses = {
         
@@ -12,5 +13,49 @@ def index(request):
         'learn' : ['flask', 'django', 'Torado', 'FastAPI'],
         'course_provider' : 'scaler'
     }
+    if request.method == 'GET':
+        print('you hit get method')
+        return Response(courses)
+    elif request.method == 'POST':
+        data = request.data
+        print("*****")
+        print(data)
+        print('you hit post method')
+        return Response(courses)
     
-    return Response(courses)
+    
+    
+@api_view(['GET', 'POST', 'PUT', 'PATCH'])
+def people(request):
+    if request.method == 'GET':
+        objs = Person.objects.all()
+        serializer = PeopleSerializer(objs, many = True )
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        data = request.data
+        serializer = PeopleSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    elif request.method == 'PUT':
+        data = request.data
+        objs = Person.objects.get(id = data['id'])
+        serializer = PeopleSerializer(objs, data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors)
+    
+    elif request.method == 'PATCH':
+        data = request.data
+        objs = Person.objects.get(id = data['id'])
+        serializer = PeopleSerializer(objs, data = data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
