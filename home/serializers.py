@@ -7,3 +7,16 @@ class PeopleSerializer(serializers.ModelSerializer):
         model = Person
         fields =    '__all__'   #['name', 'age'] 
         #exclude = ['']
+        
+    def validate(self, data):
+        
+        special_characters = "!@#$%^&*()-_=+[{]}\|;:',<.>/? "
+        if any( c in special_characters for c in data['name']):
+            raise serializers.ValidationError("name can not contain special characters")
+        
+        if data['age'] < 18:
+            raise serializers.ValidationError('age should be greater than 18')
+        
+        return data 
+    
+    

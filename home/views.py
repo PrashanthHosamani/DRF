@@ -25,7 +25,7 @@ def index(request):
     
     
     
-@api_view(['GET', 'POST', 'PUT', 'PATCH'])
+@api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def people(request):
     if request.method == 'GET':
         objs = Person.objects.all()
@@ -59,3 +59,9 @@ def people(request):
             return Response(serializer.data)
         return Response(serializer.errors)
     
+    
+    else:
+        data = request.data 
+        objs = Person.objects.get(id = data['id'])
+        objs.delete()
+        return Response({"message" : 'Person deleted'})
