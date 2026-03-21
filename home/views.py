@@ -1,7 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from . models import Person, Color
-from . serializers import PeopleSerializer, ColorSerializer
+from rest_framework.views import APIView
+from . serializers import PeopleSerializer, ColorSerializer, LoginSerializer
+from rest_framework import viewsets
+
 
 
 # api/i
@@ -27,12 +30,12 @@ def index(request):
     
 @api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def people(request):
-    if request.method == 'GET':
-        objs = Person.objects.all()
-        serializer = PeopleSerializer(objs, many = True )
-        return Response(serializer.data)
+    # if request.method == 'GET':
+    #     objs = Person.objects.all()
+    #     serializer = PeopleSerializer(objs, many = True )
+    #     return Response(serializer.data)
     
-    elif request.method == 'POST':
+    if request.method == 'POST':
         data = request.data
         serializer = PeopleSerializer(data = data)
         if serializer.is_valid():
@@ -81,4 +84,40 @@ def color(request):
            serializer.save()
            return Response(serializer.data)
        return Response(serializer.errors)
-       
+   
+@api_view(['POST'])
+def login(request):
+    data = request.data
+    serializer = LoginSerializer(data = data)
+    if serializer.is_valid():
+        data = serializer.validated_data
+        return Response({"message" : "success"})
+    return Response(serializer.errors)
+
+class PersonAPI(APIView):  #no need to check the HTTP method to return anything, APIView authomatically campare with HTTP verb and indentifies based on name of the method 
+    
+    def get(self, request): #lets implement to get all the people
+        obj = Person.objects.all()
+        serializer = PeopleSerializer(obj, many = True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        return Response("This is a post method")
+    
+    def put(self, request):
+        return Response("This is put method")
+    
+    def pacth(self, request):
+        return Response("This is a patch method")
+    
+    def delete(self, request):
+        return Response("This is a delete method")
+    
+    
+
+class PeopleViewSet(viewsets.ModelViewSet): #to get implement all the CRUD API's 
+    serializer_class = PeopleSerializer
+    queryset = Person.objects.all()
+    #register the router using DefaultRouter
+    
+
